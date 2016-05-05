@@ -12,7 +12,7 @@
 
 </VirtualHost>
 
-<VirtualHost <%= scope.lookupvar("::jenkins::master::vhost_name") %>:443>
+<VirtualHost *:443>
              ServerName <%= scope.lookupvar("::jenkins::master::vhost_name") %>
              ServerAdmin <%= scope.lookupvar("::jenkins::master::serveradmin") %>
 

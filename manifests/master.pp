@@ -27,6 +27,14 @@ class jenkins::master(
     require => Package['openjdk-7-jre-headless'],
   }
 
+  file { '/tmp/aptly.pub':
+    ensure => present,
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0644',
+    source => 'puppet:///modules/jenkins/aptly.pub',
+  }
+
   apt::source { 'jenkins':
     location      => 'http://aptly.liberty.mikelangelo.gwdg.de/testing',
     repos         => 'main',
@@ -34,10 +42,11 @@ class jenkins::master(
     pin           => '1002',
     key         => {
       'id'     => '5B834965F7F7ECCAE8186F7788B9C67706E0E48F',
-      'source' => '/vagrant/files/aptly/aptly.pub',
+      'source' => '/tmp/aptly.pub',
     },
     require     => [
       Package['openjdk-7-jre-headless'],
+      File['/tmp/aptly.pub'],
     ],
     include_src => false,
   }

@@ -28,12 +28,13 @@ class jenkins::master(
   }
 
   apt::source { 'jenkins':
-    location    => 'http://pkg.jenkins-ci.org/debian-stable',
-    release     => 'binary/',
-    repos       => '',
+    location      => 'http://aptly.liberty.mikelangelo.gwdg.de/testing',
+    repos         => 'main',
+    architecture  => 'amd64',
+    pin           => '1002',
     key         => {
-      'id'     => 'D50582E6',
-      'source' => 'http://pkg.jenkins-ci.org/debian/jenkins-ci.org.key',
+      'id'     => '5B834965F7F7ECCAE8186F7788B9C67706E0E48F',
+      'source' => '/vagrant/files/aptly/aptly.pub',
     },
     require     => [
       Package['openjdk-7-jre-headless'],

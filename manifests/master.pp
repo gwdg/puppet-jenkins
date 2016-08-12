@@ -35,21 +35,21 @@ class jenkins::master(
     source => 'puppet:///modules/jenkins/aptly.pub',
   }
 
-  apt::source { 'jenkins':
-    location      => 'http://aptly.liberty.mikelangelo.gwdg.de/testing',
-    repos         => 'main',
-    architecture  => 'amd64',
-    pin           => '1002',
-    key         => {
-      'id'     => '5B834965F7F7ECCAE8186F7788B9C67706E0E48F',
-      'source' => '/tmp/aptly.pub',
-    },
-    require     => [
-      Package['openjdk-7-jre-headless'],
-      File['/tmp/aptly.pub'],
-    ],
-    include_src => false,
-  }
+  #apt::source { 'jenkins':
+  #  location      => 'http://aptly.liberty.mikelangelo.gwdg.de/testing',
+  #  repos         => 'main',
+  #  architecture  => 'amd64',
+  #  pin           => '1002',
+  #  key         => {
+  #    'id'     => '5B834965F7F7ECCAE8186F7788B9C67706E0E48F',
+  #    'source' => '/tmp/aptly.pub',
+  #  },
+  #  require     => [
+  #    Package['openjdk-7-jre-headless'],
+  #    File['/tmp/aptly.pub'],
+  #  ],
+  #  include_src => false,
+  #}
 
   ::httpd::vhost { $vhost_name:
     port     => 443,
@@ -121,17 +121,34 @@ class jenkins::master(
     ensure => present,
   }
 
-  package { 'jenkins':
+  file { '/tmp/jenkins_1.651_all.deb':
     ensure  => present,
-    require => Apt::Source['jenkins'],
+    owner   => 'jenkins',
+    group   => 'jenkins',
+    source  => 'puppet:///modules/jenkins/jenkins_1.651_all.deb',
+    require     => [
+      Package['openjdk-7-jre-headless'],
+    ],
+  } 
+
+  package { 'jenkins':
+    provider => dpkg,
+    ensure   => latest,
+    source   => '/tmp/jenkins_1.651_all.deb',
+    require  => File['/tmp/jenkins_1.651_all.deb'],
   }
 
-  exec { 'update apt cache':
-    subscribe   => File['/etc/apt/sources.list.d/jenkins.list'],
-    refreshonly => true,
-    path        => '/bin:/usr/bin',
-    command     => 'apt-get update',
-  }
+  #package { 'jenkins':
+  #  ensure  => present,
+  #  require => Apt::Source['jenkins'],
+  #}
+
+  #exec { 'update apt cache':
+  #  subscribe   => File['/etc/apt/sources.list.d/jenkins.list'],
+  #  refreshonly => true,
+  #  path        => '/bin:/usr/bin',
+  #  command     => 'apt-get update',
+  #}
 
   file { '/etc/default/jenkins':
     ensure => present,
